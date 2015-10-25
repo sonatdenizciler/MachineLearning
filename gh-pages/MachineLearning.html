@@ -90,8 +90,6 @@ img {
 <div id="loading-and-cleaning-data" class="section level3">
 <h3>Loading and Cleaning Data</h3>
 <p>First we load the necessary libraries, plant seed for reproduceability and load data.</p>
-<p>pmlTrain &lt;- read.csv(url(“<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>”),stringsAsFactors = FALSE)</p>
-<p>pmlTest &lt;- read.csv(url(“<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>”),stringsAsFactors = FALSE)</p>
 <pre class="r"><code>library(knitr)
 library(caret)
 
@@ -105,7 +103,6 @@ dim(pmlTest)</code></pre>
 <pre class="r"><code>dim(pmlTrain)</code></pre>
 <pre><code>## [1] 19622   160</code></pre>
 <p>So we have 160 predictors. We need to do a bit of cleaning. We can for example remove predictors that are character, since modeling requires numeric observations.</p>
-<p>We should remove those predictors which have some NA values in them.</p>
 <pre class="r"><code>training_dt &lt;- as.matrix(sapply(pmlTrain,typeof))
 training_dt_char &lt;- which(training_dt[,1] == &quot;character&quot;)</code></pre>
 <p>However before we do that we need to exclude “classe” variable because this is what we would like to predict. The following reveals the index where this variable is.</p>
@@ -125,7 +122,7 @@ pmlTrain &lt;- pmlTrain[,-training_dt_char]</code></pre>
 </div>
 <div id="analysis-and-prediction" class="section level3">
 <h3>Analysis and Prediction</h3>
-<p>Random Forest seems to be a good candidate since there are multiple There is too much data which would take too long to process on a PC. So we should first create a smaller set and then partition it into training and testing.</p>
+<p>We devide data into training and testing data. Since we have lots of data we can use 90% training.</p>
 <pre class="r"><code>inTrain &lt;- createDataPartition(y=pmlTrain$classe,p=0.90,list=FALSE)
 training &lt;- pmlTrain[inTrain,]
 testing &lt;- pmlTrain[-inTrain,]</code></pre>
@@ -136,7 +133,7 @@ testing &lt;- pmlTrain[-inTrain,]</code></pre>
 <pre><code>## [1] 17662    56</code></pre>
 <pre class="r"><code>dim(testing)</code></pre>
 <pre><code>## [1] 1960   56</code></pre>
-<p>In fact a good model would be random forest.</p>
+<p>In fact a good model would be random forest. I had to do a lot of tweaking with the train controls in order to make train complete in a reasonable time which consumed a lot of time. Therefore I am unable to dwell more into details and just create the model which predicts accurecy of 99%+ which is pretty good, so I leave it at that.</p>
 <pre class="r"><code>ctrl = trainControl(method=&quot;repeatedcv&quot;, number=2, repeats=1, selectionFunction = &quot;oneSE&quot;)
 modFit &lt;- train(classe ~., data=training, method=&quot;rf&quot;,trControl=ctrl)
 modFit</code></pre>

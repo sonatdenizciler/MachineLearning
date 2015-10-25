@@ -26,10 +26,6 @@ The goal of your project is to predict the manner in which they did the exercise
 
 First we load the necessary libraries, plant seed for reproduceability and load data. 
 
-pmlTrain <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"),stringsAsFactors = FALSE)
-
-pmlTest <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"),stringsAsFactors = FALSE)
-
 ``` {r message=FALSE, warning=FALSE}
 library(knitr)
 library(caret)
@@ -44,9 +40,6 @@ dim(pmlTrain)
 ```
 
 So we have 160 predictors. We need to do a bit of cleaning. We can for example remove predictors that are character, since modeling requires numeric observations.
-
-
-We should remove those predictors which have some NA values in them.
 
 ``` {r message=FALSE, warning=FALSE}
 training_dt <- as.matrix(sapply(pmlTrain,typeof))
@@ -86,8 +79,7 @@ pmlTrain$classe <- as.factor(pmlTrain$classe)
 ```
 
 ### Analysis and Prediction ###
-
-Random Forest seems to be a good candidate since there are multiple There is too much data which would take too long to process on a PC. So we should first create a smaller set and then partition it into training and testing.
+We devide data into training and testing data. Since we have lots of data we can use 90% training.
 
 ``` {r message=FALSE, warning=FALSE}
 inTrain <- createDataPartition(y=pmlTrain$classe,p=0.90,list=FALSE)
@@ -103,7 +95,7 @@ dim(training)
 dim(testing)
 ```
 
-In fact a good model would be random forest.
+In fact a good model would be random forest. I had to do a lot of tweaking with the train controls in order to make train complete in a reasonable time which consumed a lot of time. Therefore I am unable to dwell more into details and just create the model which predicts accurecy of 99%+ which is pretty good, so I leave it at that.
 
 ``` {r message=FALSE, warning=FALSE}
 ctrl = trainControl(method="repeatedcv", number=2, repeats=1, selectionFunction = "oneSE")
